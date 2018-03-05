@@ -37,9 +37,9 @@ network={
     key_mgmt=WPA-PSK
 }
 ```
-## copy over files
 
 # Basic RPi setup
+##Insert SD card and plug in raspberry pi
 ssh pi@raspberrypi.local
     raspberry
 sudo raspi-config
@@ -48,6 +48,13 @@ sudo raspi-config
 echo "127.0.1.1 eritv1" >> /etc/hosts
 sudo apt-get update
 sudo apt-get upgrade
+
+cd /home/pi
+wget https://github.com/babraham123/rpi_livestream/archive/master.zip
+unzip master.zip
+mv rpi_livestream/* /home/pi/
+rm rpi_livestream
+sudo chmod 777 home/pi/public
 
 # Setup dnsmasq and hostapd
 sudo apt-get install -y dnsmasq hostapd
@@ -96,8 +103,7 @@ bind-interfaces
 nslookup google.com localhost
 
 # Autohotspot Service
-sudo vi /usr/bin/autohotspot
-    ##paste in from autohotspot.sh
+sudo cp /home/pi/autohotspot.sh /usr/bin/autohotspot
 sudo chmod +x /usr/bin/autohotspot
 sudo vi /etc/systemd/system/autohotspot.service
 ```
@@ -116,13 +122,8 @@ sudo systemctl enable autohotspot # start on boot
 sudo systemctl disable autohotspot # stop on boot
 
 # Nodejs server
-## copy project files to home directory
-git clone git@github.com:babraham123/rpi_livestream.git
-cp -r rpi_livestream/* /home/pi/
-cd /home/pi
 npm install
-sudo vi /usr/bin/addwificreds
-    ##paste in from addwificreds.sh
+sudo cp /home/pi/addwificreds.sh /usr/bin/addwificreds
 sudo chmod +x /usr/bin/addwificreds
 
 sudo vi /etc/systemd/system/signinserver.service

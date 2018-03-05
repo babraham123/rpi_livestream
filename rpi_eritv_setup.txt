@@ -1,0 +1,28 @@
+# EriTV livestream set up
+
+# References
+https://raspberrypi.stackexchange.com/questions/27688/how-to-play-akamai-adaptive-hls-stream-in-fullscreen-mode-with-auto-start-on-boo
+http://docs.livestreamer.io/cli.html
+
+sudo apt-get install -y python-bs4
+sudo cp /home/pi/extract_play.sh /usr/bin/extractplay
+sudo chmod +x /usr/bin/extractplay
+sudo vi /etc/systemd/system/eritvstream.service
+```
+[Unit]
+Description=Stream EriTV Live
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+ExecStart=/usr/bin/extractplay
+
+[Install]
+WantedBy=multi-user.target
+```
+sudo systemctl daemon-reload
+sudo systemctl start eritvstream
+sudo systemctl stop eritvstream
+
+

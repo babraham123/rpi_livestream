@@ -12,25 +12,26 @@
 #Other setup required find out more at
 #http://www.raspberryconnect.com
 
-wifidev="wlan0" #device name to use. Default is wlan0.
-#use the command: iw dev ,to see wifi interface name 
+GetWifiDetails()
+{
+    wifidev="wlan0" #device name to use. Default is wlan0.
+    #use the command: iw dev ,to see wifi interface name 
 
-IFSdef=$IFS
-#These four lines capture the wifi networks the RPi is setup to use
-wpassid=$(awk '/ssid="/{ print $0 }' /etc/wpa_supplicant/wpa_supplicant.conf | awk -F'ssid=' '{ print $2 }' ORS=',' | sed 's/\"/''/g' | sed 's/,$//')
-IFS=","
-ssids=($wpassid)
-IFS=$IFSdef #reset back to defaults
+    IFSdef=$IFS
+    #These four lines capture the wifi networks the RPi is setup to use
+    wpassid=$(awk '/ssid="/{ print $0 }' /etc/wpa_supplicant/wpa_supplicant.conf | awk -F'ssid=' '{ print $2 }' ORS=',' | sed 's/\"/''/g' | sed 's/,$//')
+    IFS=","
+    ssids=($wpassid)
+    IFS=$IFSdef #reset back to defaults
 
+    #Note:If you only want to check for certain SSIDs
+    #ssids=('mySSID1' 'mySSID2' 'mySSID3')
 
-#Note:If you only want to check for certain SSIDs
-#ssids=('mySSID1' 'mySSID2' 'mySSID3')
-
-#Enter the Routers Mac Addresses for hidden SSIDs, seperated by spaces ie 
-#( '11:22:33:44:55:66' 'aa:bb:cc:dd:ee:ff' ) 
-mac=()
-
-ssidsmac=("${ssids[@]}" "${mac[@]}") #combines ssid and MAC for checking
+    #Enter the Routers Mac Addresses for hidden SSIDs, seperated by spaces ie 
+    #( '11:22:33:44:55:66' 'aa:bb:cc:dd:ee:ff' ) 
+    mac=()
+    ssidsmac=("${ssids[@]}" "${mac[@]}") #combines ssid and MAC for checking
+}
 
 createAdHocNetwork()
 {
@@ -64,6 +65,8 @@ ChkWifiUp()
         wpa_cli terminate "$wifidev" >/dev/null 2>&1
         createAdHocNetwork
     fi
+    # the payload, needs internet access
+    systemctl start eritvstream
 }
 
 StartWifi()
@@ -159,4 +162,5 @@ Main()
     fi
 }
 
+GetWifiDetails
 Main

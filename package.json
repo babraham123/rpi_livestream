@@ -1,6 +1,6 @@
 {
-    "name" : "RaspHotspotProject",
-    "version" : "0.1",
+    "name" : "RaspbianHotspotProject",
+    "version" : "0.0.1",
     "description": "A small express server to collect wifi credentials",
     "author": "Bereket Abraham <babraham42@gmail.com>",
     "license" : "MIT",
