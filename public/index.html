@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="EriTV WiFi Sign-In Form">
+  <meta name="author" content="Bereket Abraham">
+  <link rel="icon" href="/favicon.ico">
+ 
+  <title>WiFi Sign-In Form</title>
+  <link href="/bootstrap.min.css" rel="stylesheet">
+  <link href="/signin.css" rel="stylesheet">
+</head>
+
+<body class="text-center">
+  <form action="/signin_post" method="post">
+    <img class="mb-4" src="/wifi.png" width="72" height="72">
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+
+    <label for="ssid" class="sr-only">Enter ssid (WiFi name): </label>
+    <input id="ssid" type="text" class="form-control" placeholder="ssid" required autofocus>
+
+    <label for="password" class="sr-only">Enter password (blank if no password): </label>
+    <input id="password" type="password" class="form-control" placeholder="password" required>
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Enter</button>
+    <p class="mt-5 mb-3 text-muted">በረኽት ሶፍትወር</p>
+  </form>
+</body>
+</html>

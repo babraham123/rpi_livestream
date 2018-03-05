@@ -1,0 +1,151 @@
+# Set up a headless Raspberry Pi Zero W to switch into hotspot / access point mode when 
+# not in wifi range. In AP mode, the Pi launches a server that asks for the wifi 
+# credentials and then switches back to the regular mode.
+
+# References
+https://slippytrumpet.io/posts/raspberry-pi-zero-w-setup/
+https://www.raspberrypi.org/documentation/configuration/wireless/access-point.md
+http://www.raspberryconnect.com/network/item/331-raspberry-pi-auto-wifi-hotspot-switch-no-internet-routing
+https://andrewmichaelsmith.com/2013/08/raspberry-pi-wi-fi-honeypot/
+
+# Setup SD card on Mac
+## Download Raspbian Stretch: https://www.raspberrypi.org/downloads/
+## If necessary, convert iso to dmg
+hdiutil convert 2017-11-29-raspbian-stretch.iso -format UDRW -o 2017-11-29-raspbian-stretch.img
+## Insert mini SD card into computer
+## FAT32 limit 4G per file, use ExFAT if needed
+diskutil list
+sudo diskutil unmountdisk /dev/disk2
+sudo diskutil eraseDisk FAT32 BOOT MBRFormat /dev/disk2
+sudo diskutil unmountdisk /dev/disk2
+sudo dd bs=1m if=2017-11-29-raspbian-stretch.img of=/dev/disk2
+sudo diskutil mountdisk /dev/disk2
+cd /Volumes/boot/
+touch ssh
+vi config.txt
+```
+hdmi_force_hotplug=1
+hdmi_drive=2
+```
+vi wpa_supplicant.conf
+```
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+    ssid="your_ssid"
+    psk="your_pass"
+    key_mgmt=WPA-PSK
+}
+```
+## copy over files
+
+# Basic RPi setup
+ssh pi@raspberrypi.local
+    raspberry
+sudo raspi-config
+## expand file system, set password to something long, remove root from ssh
+    verylongpasswdyoucannotsee
+echo "127.0.1.1 eritv1" >> /etc/hosts
+sudo apt-get update
+sudo apt-get upgrade
+
+# Setup dnsmasq and hostapd
+sudo apt-get install -y dnsmasq hostapd
+sudo systemctl stop dnsmasq
+sudo systemctl stop hostapd
+
+dpkg -s dnsmasq
+## if version < 2.77 then
+sudo apt-get purge dns-root-data
+
+iw dev
+# check the interface name wl* and fix cmds according
+sudo mv /etc/network/interfaces /etc/network/interfaces.bak
+sudo vi /etc/network/interfaces
+```
+# interfaces(5) file used by ifup(8) and ifdown(8) 
+# Please note that this file is written to be used with dhcpcd 
+# For static IP, consult /etc/dhcpcd.conf and 'man dhcpcd.conf' 
+# Include files from /etc/network/interfaces.d: 
+source-directory /etc/network/interfaces.d 
+```
+sudo mv /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.bak
+sudo vi /etc/hostapd/hostapd.conf
+## Channel can be 1-13 if there's interference
+```
+interface=wlan0
+driver=nl80211
+ssid=EriTVSetup
+channel=6
+```
+sudo vim /etc/default/hostapd
+```
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
+#DAEMON_OPTS=""
+```
+sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bak
+sudo vi /etc/dnsmasq.conf
+```
+address=/#/10.0.0.1
+interface=wlan0
+dhcp-range=10.0.0.10,10.0.0.50,12h
+no-resolv
+bind-interfaces
+```
+## test dns
+nslookup google.com localhost
+
+# Autohotspot Service
+sudo vi /usr/bin/autohotspot
+    ##paste in from autohotspot.sh
+sudo chmod +x /usr/bin/autohotspot
+sudo vi /etc/systemd/system/autohotspot.service
+```
+[Unit]
+Description=Automatically generates an internet Hotspot when a valid ssid is not in range
+After=multi-user.target
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/autohotspot
+[Install]
+WantedBy=multi-user.target
+```
+sudo systemctl daemon-reload
+sudo systemctl enable autohotspot # start on boot
+sudo systemctl disable autohotspot # stop on boot
+
+# Nodejs server
+## copy project files to home directory
+git clone git@github.com:babraham123/rpi_livestream.git
+cp -r rpi_livestream/* /home/pi/
+cd /home/pi
+npm install
+sudo vi /usr/bin/addwificreds
+    ##paste in from addwificreds.sh
+sudo chmod +x /usr/bin/addwificreds
+
+sudo vi /etc/systemd/system/signinserver.service
+```
+[Unit]
+Description=Serve a simple website to record your WiFis ssid and password
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+ExecStart=/usr/bin/node /home/pi/signin_server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+sudo systemctl daemon-reload
+sudo systemctl start signinserver
+sudo systemctl stop signinserver
+
+# Test
+sudo reboot
+ssh pi@eritv1.local
+ssh pi@10.0.0.1 # if hotspot
+

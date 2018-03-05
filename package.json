@@ -1,0 +1,23 @@
+{
+    "name" : "RaspHotspotProject",
+    "version" : "0.1",
+    "description": "A small express server to collect wifi credentials",
+    "author": "Bereket Abraham <babraham42@gmail.com>",
+    "license" : "MIT",
+
+    "dependencies" : {
+        "body-parser" : "latest",
+        "express" : ">3.3.0"
+    },
+
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/babraham123/rpi_livestream"
+    },
+    "keywords": [
+        "nodejs",
+        "hotspot",
+        "wifi",
+        "raspberry pi"
+    ]
+}
