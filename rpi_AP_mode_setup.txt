@@ -37,6 +37,7 @@ network={
     key_mgmt=WPA-PSK
 }
 ```
+sudo diskutil unmountdisk /dev/disk2
 
 # Basic RPi setup
 ##Insert SD card and plug in raspberry pi
@@ -45,7 +46,11 @@ ssh pi@raspberrypi.local
 sudo raspi-config
 ## expand file system, set password to something long, remove root from ssh
     verylongpasswdyoucannotsee
-echo "127.0.1.1 eritv1" >> /etc/hosts
+sudo vim /etc/hosts
+```
+127.0.1.1 eritv1
+```
+sudo apt-get install -y vim git cmake
 sudo apt-get update
 sudo apt-get upgrade
 
@@ -54,7 +59,7 @@ wget https://github.com/babraham123/rpi_livestream/archive/master.zip
 unzip master.zip
 mv rpi_livestream/* /home/pi/
 rm rpi_livestream
-sudo chmod 777 home/pi/public
+sudo chmod 777 /home/pi/public
 
 # Setup dnsmasq and hostapd
 sudo apt-get install -y dnsmasq hostapd
@@ -122,6 +127,7 @@ sudo systemctl enable autohotspot # start on boot
 sudo systemctl disable autohotspot # stop on boot
 
 # Nodejs server
+sudo apt-get install -y nodejs npm
 npm install
 sudo cp /home/pi/addwificreds.sh /usr/bin/addwificreds
 sudo chmod +x /usr/bin/addwificreds
@@ -131,13 +137,10 @@ sudo vi /etc/systemd/system/signinserver.service
 [Unit]
 Description=Serve a simple website to record your WiFis ssid and password
 After=network.target
-
 [Service]
 Type=simple
-User=pi
-ExecStart=/usr/bin/node /home/pi/signin_server.js
+ExecStart=/usr/bin/nodejs /home/pi/signin_server.js
 Restart=on-failure
-
 [Install]
 WantedBy=multi-user.target
 ```

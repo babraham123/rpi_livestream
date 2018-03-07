@@ -7,7 +7,7 @@ network={
     ssid=\"$1\"
     psk=\"$2\"
 }
-" >> /etc/wpa_supplicant/wpa_supplicant.conf
+" | sudo tee --append /etc/wpa_supplicant/wpa_supplicant.conf > /dev/null
 
 # stop hotspot, connect to wifi, stop signin server
-/usr/bin/autohotspot
+sudo /usr/bin/autohotspot

@@ -6,13 +6,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const child_process = require('child_process');
 
-const ssids = child_process.execSync('iw dev "$wifidev" scan ap-force | egrep "^BSS|SSID:"').split(',');
+const ssids = child_process.execSync('sudo iw dev "$wifidev" scan ap-force | egrep "^BSS|SSID:"').split(',');
 
 // Create application/x-www-form-urlencoded parser
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const app = express();
-app.use(express.static('public'));
+app.use(express.static(__dirname + "/" + 'public'));
 
 // app.get('/index.html', function (req, res) {
 //    res.sendFile( __dirname + "/" + "public/index.html" );
@@ -23,10 +23,10 @@ app.post('/signin_post', urlencodedParser, function (req, res) {
         ssid:req.body.ssid,
         password:req.body.password
     };
-    res.sendFile( __dirname + "/" + "public/response.html" );
+    res.sendFile(__dirname + '/' + 'public/response.html');
 
     // add ssid to wpa_supplicant.conf
-    child_process.exec('/usr/bin/addwificreds ${response.ssid} ${response.password}', (error, stdout, stderr) => {
+    child_process.exec('sudo /usr/bin/addwificreds ${response.ssid} ${response.password}', (error, stdout, stderr) => {
         if(error) {
             console.error('exec error: ${error}');
         }
