@@ -26,6 +26,7 @@ vi config.txt
 ```
 hdmi_force_hotplug=1
 hdmi_drive=2
+dtoverlay=pi3-disable-bt
 ```
 vi wpa_supplicant.conf
 ```
@@ -44,22 +45,31 @@ sudo diskutil unmountdisk /dev/disk2
 ssh pi@raspberrypi.local
     raspberry
 sudo raspi-config
-## expand file system, set password to something long, remove root from ssh
+## expand file system, set password to something long, enable autologin
     verylongpasswdyoucannotsee
-sudo vim /etc/hosts
+sudo apt-get install -y vim git cmake iw
+sudo apt-get update
+sudo apt-get upgrade
+sudo vi /etc/lightdm/lightdm.conf
+## add in the [Seat:*] section
+```
+xserver-command=X -s 0 dpms
+```
+sudo vi /etc/hostname
+```
+eritv1
+```
+sudo vi /etc/hosts
 ```
 127.0.1.1 eritv1
 ```
-sudo apt-get install -y vim git cmake
-sudo apt-get update
-sudo apt-get upgrade
 
 cd /home/pi
 wget https://github.com/babraham123/rpi_livestream/archive/master.zip
 unzip master.zip
-mv rpi_livestream/* /home/pi/
-rm rpi_livestream
-sudo chmod 777 /home/pi/public
+mv rpi_livestream-master/* /home/pi/
+rm -rf rpi_livestream-master
+sudo chmod -R 777 /home/pi/public
 
 # Setup dnsmasq and hostapd
 sudo apt-get install -y dnsmasq hostapd
@@ -83,14 +93,19 @@ source-directory /etc/network/interfaces.d
 ```
 sudo mv /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.bak
 sudo vi /etc/hostapd/hostapd.conf
-## Channel can be 1-13 if there's interference
+## Channel can be 1-13 if there's interference. Confirm you have the right wifi device.
 ```
 interface=wlan0
 driver=nl80211
 ssid=EriTVSetup
-channel=6
+hw_mode=g
+channel=10
+macaddr_acl=0
+ignore_broadcast_ssid=0
+wme_enabled=0
+ieee80211n=1
 ```
-sudo vim /etc/default/hostapd
+sudo vi /etc/default/hostapd
 ```
 DAEMON_CONF="/etc/hostapd/hostapd.conf"
 #DAEMON_OPTS=""
@@ -100,21 +115,23 @@ sudo vi /etc/dnsmasq.conf
 ```
 address=/#/10.0.0.1
 interface=wlan0
-dhcp-range=10.0.0.10,10.0.0.50,12h
+dhcp-range=10.0.0.2,10.0.0.20,12h
 no-resolv
 bind-interfaces
+dhcp-authoritative
 ```
 ## test dns
 nslookup google.com localhost
 
 # Autohotspot Service
+## make sure to properly set the payload systemd service in autohotspot.sh
 sudo cp /home/pi/autohotspot.sh /usr/bin/autohotspot
 sudo chmod +x /usr/bin/autohotspot
 sudo vi /etc/systemd/system/autohotspot.service
 ```
 [Unit]
 Description=Automatically generates an internet Hotspot when a valid ssid is not in range
-After=multi-user.target
+After=network.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
@@ -131,7 +148,7 @@ sudo apt-get install -y nodejs npm
 npm install
 sudo cp /home/pi/addwificreds.sh /usr/bin/addwificreds
 sudo chmod +x /usr/bin/addwificreds
-
+sudo chmod +x /home/pi/signin_server.js
 sudo vi /etc/systemd/system/signinserver.service
 ```
 [Unit]
@@ -149,6 +166,10 @@ sudo systemctl start signinserver
 sudo systemctl stop signinserver
 
 # Test
+python /home/pi/extract_url.py
+sudo iw dev wlan0 scan ap-force | egrep "SSID:"
+sudo nodejs /home/pi/sign_in.js
+
 sudo reboot
 ssh pi@eritv1.local
 ssh pi@10.0.0.1 # if hotspot

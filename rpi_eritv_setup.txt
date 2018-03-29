@@ -4,9 +4,9 @@
 https://raspberrypi.stackexchange.com/questions/27688/how-to-play-akamai-adaptive-hls-stream-in-fullscreen-mode-with-auto-start-on-boo
 http://docs.livestreamer.io/cli.html
 
-sudo apt-get install -y python-bs4
-sudo cp /home/pi/extract_play.sh /usr/bin/extractplay
-sudo chmod +x /usr/bin/extractplay
+sudo apt-get install -y python-bs4 livestreamer omxplayer
+sudo cp /home/pi/play_video.sh /usr/bin/playvideo
+sudo chmod +x /usr/bin/playvideo
 sudo vi /etc/systemd/system/eritvstream.service
 ```
 [Unit]
@@ -15,7 +15,7 @@ After=network.target
 [Service]
 Type=simple
 User=pi
-ExecStart=/usr/bin/extractplay
+ExecStart=/usr/bin/playvideo
 [Install]
 WantedBy=multi-user.target
 ```

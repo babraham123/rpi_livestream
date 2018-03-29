@@ -1,16 +1,14 @@
 #!/bin/bash
-#version 0.95-1-N/HS
+# version 1.0
+# derived from version 0.95-1-N/HS at the  RaspberryConnect website 
+# http://www.raspberryconnect.com/network/item/331-raspberry-pi-auto-wifi-hotspot-switch-no-internet-routing
 
-#You may share this script on the condition a reference to RaspberryConnect.com 
-#must be included in copies or derivatives of this script. 
-
-#Network Wifi & Hotspot with Internet
-#A script to switch between a wifi network and an NON Internet routed Hotspot
-#For use with a Raspberry Pi zero W or Zero with usb wifi dongle. 
-#Also for any Raspberry Pi where an internet routed hotspot is not required.
-#Works at startup or with a seperate timer or manually without a reboot
-#Other setup required find out more at
-#http://www.raspberryconnect.com
+# Network Wifi & Hotspot with Internet
+# A script to switch between a wifi network and an NON Internet routed Hotspot
+# For use with a Raspberry Pi zero W or Zero with usb wifi dongle. 
+# Also for any Raspberry Pi where an internet routed hotspot is not required.
+# Works at startup or with a seperate timer or manually without a reboot
+# Other setup required find out more at http://www.raspberryconnect.com
 
 GetWifiDetails()
 {
@@ -37,7 +35,8 @@ createAdHocNetwork()
 {
     echo "Starting Hotspot"
     ip link set dev "$wifidev" down
-    ip addr add 10.0.0.1/24 broadcast + dev "$wifidev"
+    ip addr add 10.0.0.1/24 brd + dev "$wifidev"
+    # ip address add 10.0.0.1/24 broadcast 10.0.0.255 dev "$wifidev"
     ip link set dev "$wifidev" up
     systemctl start dnsmasq
     systemctl start hostapd
@@ -59,29 +58,30 @@ ChkWifiUp()
 {
     echo "Checking WiFi connection ok"
     sleep 10 #give time for connection to be completed to router
-    if ! wpa_cli -i "$wifidev" status | grep 'ip_address' >/dev/null 2>&1
-    then #Failed to connect to wifi (check your wifi settings, password etc)
+    if wpa_cli -i "$wifidev" status | grep 'ip_address' &> /dev/null
+    then # the payload, needs internet access
+    echo "Starting payload"
+    systemctl start eritvstream
+    else #Failed to connect to wifi (check your wifi settings, password etc)
         echo 'Wifi failed to connect, falling back to Hotspot.'
-        wpa_cli terminate "$wifidev" >/dev/null 2>&1
+        wpa_cli terminate "$wifidev" &> /dev/null
         createAdHocNetwork
     fi
-    # the payload, needs internet access
-    systemctl start eritvstream
 }
 
 StartWifi()
 {
     echo "Bringing Wifi Up"
-    wpa_supplicant -B -i "$wifidev" -c /etc/wpa_supplicant/wpa_supplicant.conf >/dev/null 2>&1
+    wpa_supplicant -B -i "$wifidev" -c /etc/wpa_supplicant/wpa_supplicant.conf &> /dev/null
 }
 
 ScrubWifi()
 {
     echo "Cleaning wifi files"
-    wpa_cli terminate >/dev/null 2>&1
+    wpa_cli terminate &> /dev/null
     ip addr flush "$wifidev"
     ip link set dev "$wifidev" down
-    rm -r /var/run/wpa_supplicant >/dev/null 2>&1
+    rm -r /var/run/wpa_supplicant &> /dev/null
     ip link set dev "$wifidev" up
 }
 
@@ -101,10 +101,10 @@ FindSSID()
     local i=0; local j=0
     until [ $i -eq 1 ] #wait for wifi if busy, usb wifi is slower.
     do
-        ssidreply=$((iw dev "$wifidev" scan ap-force | egrep "^BSS|SSID:") 2>&1) >/dev/null 2>&1 
-        if echo "$ssidreply" | grep "No such device (-19)" >/dev/null 2>&1; then
+        ssidreply=$((iw dev "$wifidev" scan ap-force | egrep "^BSS|SSID:") 2>&1) &> /dev/null 
+        if echo "$ssidreply" | grep "No such device (-19)" &> /dev/null; then
             NoDevice
-        elif ! echo "$ssidreply" | grep "resource busy (-16)"  >/dev/null 2>&1 ;then
+        elif ! echo "$ssidreply" | grep "resource busy (-16)"  &> /dev/null ;then
             i=1
         elif (($j >= 5)); then #if busy 5 times goto hotspot
             ssidreply=""
@@ -117,7 +117,7 @@ FindSSID()
 
     for ssid in "${ssidsmac[@]}"
     do
-        if (echo "$ssidreply" | grep "$ssid") >/dev/null 2>&1
+        if (echo "$ssidreply" | grep "$ssid") &> /dev/null
         then
             #Valid SSid found, passing to script
             ssidChk=$ssid
@@ -136,12 +136,12 @@ Main()
     #Create Hotspot or connect to valid wifi networks
     if [ "$ssidChk" != "NoSSid" ] 
     then #ssid in range
-        if systemctl status hostapd | grep "(running)" >/dev/null 2>&1
+        if systemctl status hostapd | grep "(running)" &> /dev/null
         then #hotspot running
             KillHotspot
             StartWifi
             ChkWifiUp
-        elif { wpa_cli -i "$wifidev" status | grep 'ip_address'; } >/dev/null 2>&1
+        elif { wpa_cli -i "$wifidev" status | grep 'ip_address'; } &> /dev/null
         then #ssid already connected
             echo "Wifi already connected to a network"
         else #ssid exists and no hotspot running connect to wifi network
@@ -149,10 +149,10 @@ Main()
             ChkWifiUp
         fi
     else #ssid or MAC address not in range
-        if systemctl status hostapd | grep "(running)" >/dev/null 2>&1
+        if systemctl status hostapd | grep "(running)" &> /dev/null
         then #Hostspot already running
             echo "Hostspot already active"
-        elif { wpa_cli status | grep "$wifidev"; } >/dev/null 2>&1
+        elif { wpa_cli status | grep "$wifidev"; } &> /dev/null
         then #wifi active but hotspot not running
             ScrubWifi
             createAdHocNetwork

@@ -1,0 +1,35 @@
+Investigation
+
+1. signinserver form inputs -> undefined
+2. playvideo: unable to open hls url, 403 forbidden
+3. the wifi disconnect btn deletes it from the config
+
+4. dynamically fill dropdown menu
+5. create tutorial background (connect to EriTVSetup, go to any website, enter wifi, power cycle TV)
+
+hostapd: creates wifi access point (seems to work)
+dnsmasq: dns (domain name -> ip) + dhcp (assigning ips to clients).
+    dns provides the honeypot, # = wildcard: address=/#/10.0.0.1
+    dhcp seems to be failing
+wpa_supplicant: linux wifi client, handles auth
+
+units: autohotspot, signinserver, eritvstream, dnsmasq, hostapd
+
+sudo service --status-all
+sudo systemctl status -l [unit]
+sudo journalctl -u [unit]
+sudo systemctl stop [unit]
+# warning, the analyze cmd starts the service
+systemd-analyze verify [unit].service
+ping google.com
+sudo /usr/bin/autohotspot
+sudo /usr/bin/nodejs /home/pi/signin_server.js
+iw dev
+ip addr show
+wpa_cli -i wlan0 status
+route
+
+if ! wpa_cli -i wlan0 status | grep 'ip_address' &> /dev/null ; then echo 'TRUE'; else echo 'FALSE'; fi
+
+
+

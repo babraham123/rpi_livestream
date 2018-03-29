@@ -1,0 +1,22 @@
+# Mount a linux formatted (ext3) SD card on a Mac using a VirtualBox Ubuntu instance
+# Useful for inspection and other diagnostics
+
+## Plug in SD card and open terminal
+## record device name
+mount
+    /dev/disk2s1
+sudo diskutil unmountdisk /dev/disk2
+sudo VBoxManage internalcommands createrawvmdk -filename ./sd-card.vmdk -rawdisk /dev/disk2
+sudo chmod 777 /dev/disk2
+sudo chmod 777 ./sd-card.vmdk
+sudo diskutil unmountdisk /dev/disk2
+sudo /Applications/VirtualBox.app/Contents/MacOS/VirtualBox
+## Open the VirtualBox settings >> Storage >> Controller: SATA >> Add Hard Drive >> Choose existing disk >> sd-card.vmdk
+## Start virtual machine and find SD card (labelled Linux)
+sudo fdisk -l
+    /dev/sdb2
+sudo mkdir /media/usb
+sudo mount /dev/sdb2 /media/usb
+
+##
+sudo umount /dev/sdb2
