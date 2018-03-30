@@ -8,25 +8,27 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const child_process = require('child_process');
 
-// make sure to check the name of your wifi device (wlan0 in most cases)
-const getNetworksCmd = 'sudo iw dev wlan0 scan ap-force | egrep "SSID:"';
-const ssidRows = child_process.execSync(getNetworksCmd).toString().split('\n');
-var ssids = [];
-for (i = 0; i < ssidRows.length; i++) { 
-    var ssidName = ssidRows[i].substring("\tSSID: ".length);
-    if (ssidName && ssidName.length < 60) {
-        ssids.push(ssidName);
-    }
-}
-console.log(ssids);
-
 // Create application/x-www-form-urlencoded parser
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const app = express();
 app.use(express.static('/home/pi/public'));
 
-app.post('/signin_post', urlencodedParser, function (req, res) {
+app.get('/ssids', function(req, res) {
+    // make sure to check the name of your wifi device (wlan0 in most cases)
+    const getNetworksCmd = 'sudo iw dev wlan0 scan ap-force | egrep "SSID:"';
+    const ssidRows = child_process.execSync(getNetworksCmd).toString().split('\n');
+    var ssids = [];
+    for (i = 0; i < ssidRows.length; i++) { 
+        var ssidName = ssidRows[i].substring("\tSSID: ".length);
+        if (ssidName && ssidName.length < 60) {
+            ssids.push(ssidName);
+        }
+    }
+    res.send(JSON.stringify({'ssids': ssids}));
+})
+
+app.post('/signin', urlencodedParser, function (req, res) {
     response = {
         ssid:req.body.ssid,
         password:req.body.password
