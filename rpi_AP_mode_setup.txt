@@ -168,7 +168,7 @@ sudo systemctl stop signinserver
 # Test
 python /home/pi/extract_url.py
 sudo iw dev wlan0 scan ap-force | egrep "SSID:"
-sudo nodejs /home/pi/sign_in.js
+sudo nodejs /home/pi/signin_server.js
 
 sudo reboot
 ssh pi@eritv1.local
