@@ -8,10 +8,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const child_process = require('child_process');
 
-// Create application/x-www-form-urlencoded parser
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
-
 const app = express();
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
 app.use(express.static('/home/pi/public'));
 
 app.get('/ssids', function(req, res) {
@@ -28,12 +28,8 @@ app.get('/ssids', function(req, res) {
     res.send(JSON.stringify({'ssids': ssids}));
 })
 
-app.post('/signin', urlencodedParser, function (req, res) {
-    response = {
-        ssid:req.body.ssid,
-        password:req.body.password
-    };
-    const addWifiCmd = 'sudo /usr/bin/addwificreds "' + response.ssid + '" "' + response.password + '"';
+app.post('/signin', function (req, res) {
+    const addWifiCmd = 'sudo /usr/bin/addwificreds "' + req.body.ssid + '" "' + req.body.password + '"';
     console.log(addWifiCmd);
 
     // add ssid to wpa_supplicant.conf

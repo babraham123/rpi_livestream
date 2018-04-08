@@ -17,17 +17,17 @@
 </head>
 
 <body class="text-center">
-  <form action="/signin" method="post" id="wifiform">
+  <form action="/signin" method="post">
     <img class="mb-4" src="/wifi.png" width="72" height="72">
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
 
     <label for="ssid" class="sr-only">Enter ssid (WiFi name): </label>
-    <select id="ssid" class="form-control" form="wifiform">
+    <select id="ssid" name="ssid" class="form-control">
       <!-- <option value="wifi1">wifi1</option> -->
     </select>
 
     <label for="password" class="sr-only">Enter password (blank if no password): </label>
-    <input id="password" type="password" class="form-control" placeholder="password" required>
+    <input id="password" name="password" type="password" class="form-control" placeholder="password" required>
 
     <button class="btn btn-lg btn-primary btn-block" type="submit">Enter</button>
     <p class="mt-5 mb-3 text-muted">በረኽት ሶፍትወር</p>
