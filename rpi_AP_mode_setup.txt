@@ -115,13 +115,13 @@ sudo vi /etc/dnsmasq.conf
 ```
 address=/#/10.0.0.1
 interface=wlan0
-dhcp-range=10.0.0.2,10.0.0.20,12h
+dhcp-range=10.0.0.20,10.0.0.50,12h
 no-resolv
-bind-interfaces
-dhcp-authoritative
 ```
-## test dns
-nslookup google.com localhost
+sudo vi /etc/resolv.conf
+```
+nameserver 8.8.8.8
+```
 
 # Autohotspot Service
 ## make sure to properly set the payload systemd service in autohotspot.sh

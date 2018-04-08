@@ -26,8 +26,9 @@ sudo /usr/bin/autohotspot
 sudo /usr/bin/nodejs /home/pi/signin_server.js
 iw dev
 ip addr show
-wpa_cli -i wlan0 status
+sudo wpa_cli -i wlan0 status
 route
+nslookup google.com localhost
 
 if ! wpa_cli -i wlan0 status | grep 'ip_address' &> /dev/null ; then echo 'TRUE'; else echo 'FALSE'; fi
 

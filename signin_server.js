@@ -32,22 +32,24 @@ app.post('/signin', function (req, res) {
     const addWifiCmd = 'sudo /usr/bin/addwificreds "' + req.body.ssid + '" "' + req.body.password + '"';
     console.log(addWifiCmd);
 
-    // add ssid to wpa_supplicant.conf
-    child_process.exec(addWifiCmd, (error, stdout, stderr) => {
-        if (error) {
-            console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-            console.error('exec error: ' + error);
-            res.sendFile('/home/pi/public/index.html');
-        } else {
-            console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-            res.sendFile('/home/pi/public/response.html');
-            setTimeout(
-                function() {
-                    process.exit();
-                }, 5000);
+    res.sendFile('/home/pi/public/response.html', {}, function (err) {
+        if (err) {
+            console.log('err: ' + err);
         }
+        // add ssid to wpa_supplicant.conf
+        child_process.exec(addWifiCmd, (error, stdout, stderr) => {
+            if (error) {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                console.error('exec error: ' + error);
+            } else {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                if (stdout.includes("Starting payload")) {
+                    process.exit();
+                }
+            }
+        });
     });
 })
 

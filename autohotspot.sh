@@ -131,6 +131,7 @@ FindSSID()
 
 Main()
 {
+    GetWifiDetails
     FindSSID
 
     #Create Hotspot or connect to valid wifi networks
@@ -162,5 +163,4 @@ Main()
     fi
 }
 
-GetWifiDetails
 Main
