@@ -1,10 +1,12 @@
 Investigation
 
-1. signinserver form inputs -> undefined
-2. playvideo: unable to open hls url, 403 forbidden
-3. the wifi disconnect btn deletes it from the config
+1. autohotspot (script and systemd) only works from cmdline, not on systemd startup. works on startup when systemd is triggered in .profile.
+2. now dnsmasq works again for AP mode. intermittent?
+3. when signing in for first time, server doesn't trigger video (add timeout again?)
 
-4. dynamically fill dropdown menu
+2. the wifi disconnect btn deletes it from the config
+3. "no address range available for dhcp request via wlan0"
+
 5. create tutorial background (connect to EriTVSetup, go to any website, enter wifi, power cycle TV)
 
 hostapd: creates wifi access point (seems to work)

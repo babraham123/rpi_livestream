@@ -60,8 +60,8 @@ ChkWifiUp()
     sleep 10 #give time for connection to be completed to router
     if wpa_cli -i "$wifidev" status | grep 'ip_address' &> /dev/null
     then # the payload, needs internet access
-    echo "Starting payload"
-    systemctl start eritvstream
+        echo "Starting payload"
+        systemctl start eritvstream
     else #Failed to connect to wifi (check your wifi settings, password etc)
         echo 'Wifi failed to connect, falling back to Hotspot.'
         wpa_cli terminate "$wifidev" &> /dev/null
@@ -145,6 +145,8 @@ Main()
         elif { wpa_cli -i "$wifidev" status | grep 'ip_address'; } &> /dev/null
         then #ssid already connected
             echo "Wifi already connected to a network"
+            echo "Starting payload"
+            systemctl restart eritvstream
         else #ssid exists and no hotspot running connect to wifi network
             StartWifi
             ChkWifiUp

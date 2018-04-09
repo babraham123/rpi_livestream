@@ -73,6 +73,8 @@ sudo chmod -R 777 /home/pi/public
 
 # Setup dnsmasq and hostapd
 sudo apt-get install -y dnsmasq hostapd
+sudo systemctl disable dnsmasq
+sudo systemctl disable hostapd
 sudo systemctl stop dnsmasq
 sudo systemctl stop hostapd
 
@@ -113,14 +115,11 @@ DAEMON_CONF="/etc/hostapd/hostapd.conf"
 sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bak
 sudo vi /etc/dnsmasq.conf
 ```
+no-resolv
 address=/#/10.0.0.1
 interface=wlan0
 dhcp-range=10.0.0.20,10.0.0.50,12h
-no-resolv
-```
-sudo vi /etc/resolv.conf
-```
-nameserver 8.8.8.8
+bind-interfaces
 ```
 
 # Autohotspot Service
