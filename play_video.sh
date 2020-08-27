@@ -1,13 +1,6 @@
 #!/bin/bash
 
-export DISPLAY=:0
-eritv_url=$(python /home/pi/extract_url.py)
+eritv_url="http://45.27.53.1:1935/live/myStream/playlist.m3u8"
 
-if [ "$eritv_url" = "NOT_FOUND" ]; then
-    echo "eritv url not found"
-    eritv_url="http://108.201.105.106:1935/live/myStream/playlist.m3u8"
-fi
-
-/usr/bin/phantomjs /home/pi/load_url.js || true
-
-livestreamer hlsvariant://${eritv_url} best --player "omxplayer -o hdmi --timeout 20 -b" --fifo
+/home/babraham/heartbeat.sh
+/usr/local/bin/livestreamer hlsvariant://${eritv_url} best --player "/usr/bin/omxplayer --timeout 20" --fifo
