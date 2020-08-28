@@ -8,23 +8,16 @@ sudo apt-get install -y python-bs4 livestreamer omxplayer
 wget https://github.com/fg2it/phantomjs-on-raspberry/raw/master/rpi-1-2-3/wheezy-jessie/v2.1.1/phantomjs
 sudo mv phantomjs /usr/bin/phantomjs
 sudo chmod +x /usr/bin/phantomjs
-sudo chmod +x /home/pi/load_url.js
-sudo cp /home/pi/play_video.sh /usr/bin/playvideo
+sudo chmod +x /home/babraham/load_url.js
+sudo cp play_video.sh /usr/bin/playvideo
 sudo chmod +x /usr/bin/playvideo
-sudo vi /etc/systemd/system/eritvstream.service
-```
-[Unit]
-Description=Stream EriTV Live
-After=network.target
-[Service]
-Type=simple
-User=pi
-ExecStart=/usr/bin/playvideo
-[Install]
-WantedBy=multi-user.target
-```
+sudo cp heartbeat.sh /usr/bin/heartbeat
+sudo chmod +x /usr/bin/heartbeat
+sudo cp eritv.service /etc/systemd/system/eritv.service
+
 sudo systemctl daemon-reload
-sudo systemctl start eritvstream
-sudo systemctl stop eritvstream
+sudo systemctl enable eritv
+sudo systemctl start eritv
+sudo systemctl stop eritv
 
 
