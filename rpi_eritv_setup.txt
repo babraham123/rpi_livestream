@@ -3,12 +3,28 @@
 # References
 https://raspberrypi.stackexchange.com/questions/27688/how-to-play-akamai-adaptive-hls-stream-in-fullscreen-mode-with-auto-start-on-boo
 http://docs.livestreamer.io/cli.html
+https://streamlink.github.io/cli.html
 
-sudo apt-get install -y python-bs4 livestreamer omxplayer
+# upgrade to python3 if necessary
+python -V
+sudo rm /usr/bin/python
+sudo ln -s python3 /usr/bin/python
+sudo rm /usr/bin/pip
+sudo ln -s pip3 /usr/bin/pip
+
+# install deps
+sudo apt-get install -y python-dev clang libssl-dev build-essential
+sudo apt-get install -y python-bs4 omxplayer
+sudo apt install -y python-socks
+sudo pip install streamlink
+
+# install browser automation
 wget https://github.com/fg2it/phantomjs-on-raspberry/raw/master/rpi-1-2-3/wheezy-jessie/v2.1.1/phantomjs
 sudo mv phantomjs /usr/bin/phantomjs
 sudo chmod +x /usr/bin/phantomjs
 sudo chmod +x /home/babraham/load_url.js
+
+# install scripts
 sudo cp play_video.sh /usr/bin/playvideo
 sudo chmod +x /usr/bin/playvideo
 sudo cp heartbeat.sh /usr/bin/heartbeat
@@ -19,5 +35,3 @@ sudo systemctl daemon-reload
 sudo systemctl enable eritv
 sudo systemctl start eritv
 sudo systemctl stop eritv
-
-
