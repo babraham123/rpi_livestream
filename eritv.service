@@ -11,7 +11,7 @@ RestartSec=10
 Type=simple
 User=babraham
 
-ExecStop=/usr/bin/killall livestreamer
+ExecStop=/usr/bin/killall streamlink
 User=babraham
 
 [Install]
