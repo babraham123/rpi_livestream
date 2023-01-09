@@ -9,7 +9,7 @@ page.onError = function(msg, trace) {
   console.error('PAGE_ERROR\n' + msg);
   phantom.exit(1);
 };
-page.open('https://www.dendenmedia.com/eri-tv/', function () {
+page.open('http://www.dendenmedia.com/eri-tv/', function () {
   console.log('PAGE_SUCCESS');
   phantom.exit();
 });
